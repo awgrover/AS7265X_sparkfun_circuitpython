@@ -1,4 +1,5 @@
 import struct
+from adafruit_bus_device.i2c_device import I2CDevice
 
 class Device:
     """Class for communicating with an I2C device.
@@ -11,6 +12,8 @@ class Device:
         the specified I2C interface object."""
         self._address = address
         self._i2c = i2c
+        self.i2c_device = I2CDevice(i2c, address)
+        self.buf2 = bytearray(2)
 
     def writeRaw8(self, value):
         """Write an 8-bit value on the bus (without register)."""
@@ -20,8 +23,13 @@ class Device:
     def write8(self, register, value):
         """Write an 8-bit value to the specified register."""
         value = value & 0xFF
-        self._i2c.writeto_mem(self._address, register, value.to_bytes(1,
-                                                                      "little"))
+        buf = self.buf2
+        buf[0] = register
+        buf[1] = value
+        with self.i2c_device as i2c:
+            i2c.write(buf)
+
+        #self._i2c.writeto_mem(self._address, register, value.to_bytes(1, "little"))
 
     def write16(self, register, value):
         """Write a 16-bit value to the specified register."""
@@ -41,6 +49,13 @@ class Device:
 
     def readU8(self, register):
         """Read an unsigned byte from the specified register."""
+        buf = self.buf2
+        buf[0] = register
+        with self.i2c_device as i2c:
+            i2c.write(buf, end=1)
+            i2c.readinto(buf, end=1)
+        return buf[0]
+
         return int.from_bytes(
             self._i2c.readfrom_mem(self._address, register, 1), 'little') & 0xFF
 

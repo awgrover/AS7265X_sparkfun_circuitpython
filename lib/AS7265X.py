@@ -2,10 +2,9 @@
     Edit by : Phumiphat Charoentananuwat"""
 # Kor long add sth ngongo na ja
 # Add again
-from micropython import const
 import time
 import struct
-from Device import Device
+from .Device import Device
 
 AS7265X_ADDR = 0x49 #7-bit unshifted default I2C Address
 
@@ -102,6 +101,10 @@ class AS7265X:
         #Check and initialize device        
         #self.init_device()
 
+    def sleep_ms(self,ms):
+        start = time.monotonic_ns()
+        while ( time.monotonic_ns() - start < (ms * 1e6) ):
+            pass
 
     #Read a virtual register from the AS7265x
     def virtual_read_register(self,virtual_address):
@@ -115,7 +118,7 @@ class AS7265X:
             status = self._device.readU8(AS7265X_SLAVE_STATUS_REG)
             if (status & AS7265X_SLAVE_TX_VALID) == 0:
                 break # No inbound TX pending at slave. Okay to write now.
-            time.sleep_ms(AS7265X_POLLING_DELAY)
+            self.sleep_ms(AS7265X_POLLING_DELAY)
         
         # Send the virtual register address (bit 7 should be 0 to indicate we are reading a register)
         self._device.write8(AS7265X_SLAVE_WRITE_REG , virtual_address)
@@ -125,7 +128,7 @@ class AS7265X:
             status = self._device.readU8(AS7265X_SLAVE_STATUS_REG)
             if((status & AS7265X_SLAVE_RX_VALID) != 0): # Data is ready
                 break # No inbound TX pending at slave. Okay to write now.
-            time.sleep_ms(AS7265X_POLLING_DELAY)
+            self.sleep_ms(AS7265X_POLLING_DELAY)
         
         result = self._device.readU8(AS7265X_SLAVE_READ_REG)
         return result
@@ -138,7 +141,7 @@ class AS7265X:
             status = self._device.readU8(AS7265X_SLAVE_STATUS_REG)
             if((status & AS7265X_SLAVE_TX_VALID) == 0):
                 break #No inbound TX pending at slave. Okay to write now.
-            time.sleep_ms(AS7265X_POLLING_DELAY)
+            self.sleep_ms(AS7265X_POLLING_DELAY)
         
         #Send the virtual register address (setting bit 7 to indicate we are writing to a register).
         self._device.write8(AS7265X_SLAVE_WRITE_REG , (virtual_address | 0x80))
@@ -148,7 +151,7 @@ class AS7265X:
             status = self._device.readU8(AS7265X_SLAVE_STATUS_REG)
             if((status & AS7265X_SLAVE_TX_VALID) == 0):
                 break # No inbound TX pending at slave. Okay to write now.
-            time.sleep_ms(AS7265X_POLLING_DELAY)
+            self.sleep_ms(AS7265X_POLLING_DELAY)
         
         # Sendthe data to complete the operation.
         self._device.write8(AS7265X_SLAVE_WRITE_REG , value)
@@ -181,7 +184,7 @@ class AS7265X:
         self.set_measurement_mode(AS7265X_MEASUREMENT_MODE_6CHAN_ONE_SHOT) #Set mode to all 6-channels , one shot
         #Wait for data to be ready
         while self.data_available() == False:
-            time.sleep_ms(AS7265X_POLLING_DELAY)
+            self.sleep_ms(AS7265X_POLLING_DELAY)
         #Readings can now be accessed via get_calibrate_A() , get_J() , etc
     
     #Turns on all bulbs, takes measurements of all channels, turns off all bulbs
