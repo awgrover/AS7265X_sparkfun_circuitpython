@@ -1,6 +1,11 @@
 # AS7265X_sparkfun_micropython
 CircuitPython driver for the AS7265X 18-channels spectral sensor
 
+Install: 
+* download the .zip
+* copy the folder `AS7265X_sparkfun/` inside `CIRCUITPY/lib`.
+* you can try the `examples/code.py` by copying it to `CIRCUITPY`
+
 Usage is very similar to https://github.com/sparkfun/SparkFun_AS7265x_Arduino_Library
 
 See the `__init__.py` and `examples/` for usage.
