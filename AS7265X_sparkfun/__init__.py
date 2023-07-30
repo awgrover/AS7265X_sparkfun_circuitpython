@@ -507,7 +507,7 @@ class AS7265X:
                 value.append(self.get_calibrated_E())
         elif self._mode == MEASUREMENT_MODE_4CHAN_2:
             #print color sequence
-            print("R / T / U / W / L / G / H / J / F / A / B / D \r\n")
+            #print("R / T / U / W / L / G / H / J / F / A / B / D \r\n")
             if RorC == 0:
                 value.append(self.get_R())
                 value.append(self.get_T())
@@ -536,7 +536,7 @@ class AS7265X:
                 value.append(self.get_calibrated_D())
         elif self._mode == MEASUREMENT_MODE_6CHAN_CONTINUOUS or self._mode == MEASUREMENT_MODE_6CHAN_ONE_SHOT:
             #print color sequence
-            print("R / S / T / U / V / W / G / H / I / J / K / L / A / B / C / D / E / F \r\n")
+            #print("R / S / T / U / V / W / G / H / I / J / K / L / A / B / C / D / E / F \r\n")
             if RorC == 0:
                 #NIR
                 value.append(self.get_R())
